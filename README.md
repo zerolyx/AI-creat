@@ -1,4 +1,13 @@
-# AI-FEA Valve Gripper
+# AI-creat
+
+开源工程工具与 Codex 技能集合。
+
+- [AI-FEA Valve Gripper](#ai-fea-valve-gripper)：球阀自动装配夹爪的 Windows 有限元分析助手。
+- [robot-competition-copilot](robot-competition-copilot/SKILL.md)：机器人竞赛协作技能。
+
+---
+
+## AI-FEA Valve Gripper
 
 面向 Q41F-16P / 16RL 法兰球阀自动装配夹爪的 Windows 有限元分析助手。软件使用本地 Gmsh 与 CalculiX 完成真实网格和线性静力求解，不依赖云端求解服务。
 
