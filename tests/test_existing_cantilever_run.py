@@ -8,13 +8,15 @@ from pathlib import Path
 from ai_fea_mvp.cli import run_cantilever
 from ai_fea_mvp.models import BeamCase
 
+from _solver import find_ccx, requires_solver
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class ExistingCantileverRunTest(unittest.TestCase):
+    @requires_solver
     def test_real_cantilever_run_has_solver_outputs_and_reasonable_results(self) -> None:
-        ccx = ROOT / "runtime" / "ccx" / "ccx.exe"
+        ccx = find_ccx()
         with tempfile.TemporaryDirectory() as folder:
             summary = run_cantilever(
                 Path(folder),

@@ -7,6 +7,8 @@ from pathlib import Path
 from ai_fea_mvp.cli import run_cantilever
 from ai_fea_mvp.gripper import GripperDuty
 
+from _solver import find_ccx, requires_solver
+
 
 class GripperDutyTest(unittest.TestCase):
     def test_dn25_example_is_below_cr605_payload_and_calculates_grip_force(self) -> None:
@@ -22,9 +24,9 @@ class GripperDutyTest(unittest.TestCase):
         self.assertFalse(duty.payload_ok)
         self.assertGreater(duty.payload_utilization_percent, 100)
 
+    @requires_solver
     def test_valve_case_uses_recommended_grip_force_for_fea(self) -> None:
-        root = Path(__file__).resolve().parents[1]
-        ccx = root / "runtime" / "ccx" / "ccx.exe"
+        ccx = find_ccx()
         with tempfile.TemporaryDirectory() as folder:
             summary = run_cantilever(Path(folder), ccx)
             self.assertAlmostEqual(summary.case.force_n, 397.169325, places=3)
