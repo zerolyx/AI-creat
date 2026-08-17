@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-windows:
-    name: Build Windows EXE (v${{ github.ref_name }})
+    name: Build Windows EXE (${{ github.ref_name }})
     runs-on: windows-latest
     permissions:
       contents: write
