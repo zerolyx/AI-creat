@@ -1,5 +1,14 @@
 from __future__ import annotations
 
+"""CalculiX solver bridge.
+
+Builds a linear-static CalculiX input deck (`.inp`) from a :class:`~ai_fea_mvp.models.BeamCase`
+and a :class:`~ai_fea_mvp.models.MeshData`, writes the fixed/load node sets and
+material card, then runs the ``ccx`` solver in the job directory and captures its
+log. ``write_calculix_input`` never runs a solver; ``run_calculix`` never writes
+one — callers chain them through :func:`ai_fea_mvp.cli.run_cantilever`.
+"""
+
 import math
 import subprocess
 from pathlib import Path

@@ -1,5 +1,15 @@
 from __future__ import annotations
 
+"""Gmsh tetrahedral meshing pipeline.
+
+Loads a STEP assembly, identifies per-volume X-min fixed and X-max load end
+faces, writes the CalculiX MSH with physical groups (SOLID / FIXED_FACE /
+LOAD_FACE), generates a first-order/second-order tetrahedral mesh, converts
+Gmsh element orientation to CalculiX convention (including C3D10 midside-node
+remap), and extracts the fixed/load boundary node sets. Returns the
+:class:`~ai_fea_mvp.models.MeshData` consumed by the CalculiX input writer.
+"""
+
 from pathlib import Path
 
 import gmsh

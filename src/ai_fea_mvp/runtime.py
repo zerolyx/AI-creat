@@ -1,5 +1,13 @@
 from __future__ import annotations
 
+"""Runtime path resolution.
+
+Resolves the project/bundled root and the CalculiX solver location for both
+source-tree use (``python run_gui.py``) and frozen PyInstaller EXE deployment
+(``sys.frozen`` / ``_MEIPASS``). Used by the packaging spec and by solver
+launch so the same code runs from source and from ``dist/AI-FEA-Valve-Gripper.exe``.
+"""
+
 import os
 import sys
 from pathlib import Path

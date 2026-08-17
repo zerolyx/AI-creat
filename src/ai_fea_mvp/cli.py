@@ -1,5 +1,14 @@
 from __future__ import annotations
 
+"""Command-line orchestration.
+
+Ties the pipeline together: :func:`run_cantilever` drives geometry → mesh →
+CalculiX input → solver → result parse → report for one load case, persists a
+``summary.json`` in the run directory, and exposes a small ``argparse`` CLI
+(:func:`main`) plus :func:`load_run_summary` for the GUI/worker to read runs
+back. This is the only module that owns the sequencing of the whole analysis.
+"""
+
 import argparse
 import json
 from dataclasses import asdict

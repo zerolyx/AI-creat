@@ -1,5 +1,14 @@
 from __future__ import annotations
 
+"""Core data models.
+
+Immutable dataclasses shared across the pipeline: the analysis :class:`BeamCase`
+(geometry, material, load direction and gripper duty inputs, plus theoretical
+beam-aid formulas), the generated :class:`MeshData`, parsed solver output
+(:class:`ParsedResults`), the per-run :class:`RunSummary`, and the
+:class:`FieldResults` carrying nodal/elemental fields for cloud rendering.
+"""
+
 from dataclasses import dataclass, field
 from pathlib import Path
 

@@ -1,5 +1,14 @@
 from __future__ import annotations
 
+"""STEP geometry handling via Gmsh.
+
+Inspects an imported STEP/STP assembly (:func:`inspect_step_geometry`) to report
+volume count and bounding boxes, derives a first-pass :class:`~ai_fea_mvp.models.BeamCase`
+(:func:`auto_case_for_step`), and generates the validation cantilever STEP model
+(:func:`create_cantilever_step`). All Gmsh sessions are initialized and finalized
+within each function so a crash in one entry point cannot leak a Gmsh session.
+"""
+
 from dataclasses import dataclass
 from pathlib import Path
 

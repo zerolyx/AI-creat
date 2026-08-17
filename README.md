@@ -1,5 +1,7 @@
 # AI-creat
 
+> **中文** · [English](README.en.md)
+
 工业机器人装配比赛相关的工程代码与工具集合。
 
 这是一个 **monorepo**：根目录承载主项目（AI-FEA Valve Gripper），同时收纳配套的机器人竞赛协作技能与独立的工业语音控制示例。每个子项目都有自己独立的职责、文档与许可证。
@@ -33,6 +35,8 @@ AI-creat/
 面向 Q41F-16P / 16RL 法兰球阀自动装配夹爪的 Windows 有限元分析助手。软件使用本地 Gmsh 与 CalculiX 完成真实网格和线性静力求解，不依赖云端求解服务。
 
 ![球阀夹爪分析界面](docs/gui_valve_gripper_final.png)
+
+包级文档见 [src/ai_fea_mvp/README.md](src/ai_fea_mvp/README.md)。
 
 ### 能做什么
 

@@ -1,5 +1,14 @@
 from __future__ import annotations
 
+"""CalculiX result parsing.
+
+Parses the ``.dat`` output into scalar maxima (:func:`parse_dat_results`) or the
+full nodal/elemental fields plus exterior tetra faces for cloud rendering
+(:func:`parse_field_results`). Tolerates CalculiX's ASCII layout with a loose
+numeric tokenizer; a missing displacement or stress section raises rather than
+returning partial data.
+"""
+
 import math
 import re
 from pathlib import Path

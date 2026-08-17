@@ -1,5 +1,14 @@
 from __future__ import annotations
 
+"""PySide6 desktop GUI.
+
+Chinese light/dark themed Windows front-end for the FEA assistant: STEP import,
+analysis-case editing, headless run via the CLI worker subprocess, result cloud
+rendering (displacement / von Mises) with max-value markers, and the generated
+Markdown report. Depends on the rest of the package for all numerics — this
+module stays focused on presentation and worker process management.
+"""
+
 import math
 import os
 import re

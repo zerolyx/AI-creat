@@ -1,7 +1,14 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+"""Gripper duty-cycle engineering checks.
 
+Encapsulates the ball-valve gripper load case against the Huashu HSR-CR605-790
+collaborative robot: rated-payload pre-check, grasp-force estimation from mass /
+dynamic factor / friction / grip safety factor, per-jaw share, and the FEA load
+recommendation (max of grip force and assembly thrust).
+"""
+
+from dataclasses import dataclass
 
 CR605_RATED_PAYLOAD_KG = 5.0
 CR605_REACH_MM = 785.0

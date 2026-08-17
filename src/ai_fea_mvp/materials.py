@@ -1,5 +1,13 @@
 from __future__ import annotations
 
+"""FDM material presets for quick screening.
+
+Provides conservative starting values (Young's modulus, Poisson ratio,
+allowable stress) for common FDM filaments. These are screening defaults only —
+actual strength varies with brand, moisture, raster direction and process
+settings, and must be verified before any sign-off.
+"""
+
 from dataclasses import dataclass
 
 

@@ -1,0 +1,52 @@
+name: Release
+
+# Builds the AI-FEA-Valve-Gripper Windows EXE and attaches it to the GitHub
+# Release for the pushed tag. Trigger on version tags (v*) or manually.
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    name: Build Windows EXE (v${{ github.ref_name }})
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install . pyinstaller
+
+      - name: Fetch CalculiX solver runtime
+        shell: pwsh
+        run: |
+          .\scripts\fetch-ccx.ps1
+
+      - name: Build EXE with PyInstaller
+        shell: pwsh
+        run: |
+          .\packaging\build_exe.ps1
+
+      - name: Verify artifact
+        shell: pwsh
+        run: |
+          $exe = "dist\AI-FEA-Valve-Gripper.exe"
+          if (-not (Test-Path $exe)) { throw "Missing artifact: $exe" }
+          Write-Host "Artifact: $exe ($((Get-Item $exe).Length) bytes)"
+
+      - name: Upload EXE to release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: dist/AI-FEA-Valve-Gripper.exe

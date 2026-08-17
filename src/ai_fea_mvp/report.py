@@ -1,5 +1,14 @@
 from __future__ import annotations
 
+"""Chinese Markdown FEA report generation.
+
+Builds the end-user report from a :class:`~ai_fea_mvp.models.RunSummary`: a
+one-sentence conclusion, model/mesh table, robot and gripping feasibility check,
+material and load summary, solver results, interpretation guidance, credibility
+notes and the list of produced files. Pure string generation — no filesystem or
+solver interaction.
+"""
+
 from datetime import datetime
 
 from .models import RunSummary

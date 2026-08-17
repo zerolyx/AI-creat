@@ -1,0 +1,41 @@
+# Normalize line endings with autocrlf-aware Git.
+* text=auto
+
+# --- Source text: force LF everywhere (Python/Markdown are cross-platform) ---
+*.py     text eol=lf
+*.md     text eol=lf
+*.toml   text eol=lf
+*.yaml   text eol=lf
+*.yml    text eol=lf
+*.json   text eol=lf
+*.cfg    text eol=lf
+*.txt    text eol=lf
+*.svg    text eol=lf
+*.css    text eol=lf
+*.html   text eol=lf
+*.js     text eol=lf
+*.ts     text eol=lf
+
+# --- Windows shell/build artifacts: keep CRLF so .bat/.ps1 behave on Windows ---
+*.ps1    text eol=crlf
+*.bat    text eol=crlf
+*.cmd    text eol=crlf
+
+# --- Binary assets: never run through text normalization ---
+*.exe    binary
+*.dll    binary
+*.otf    binary
+*.ttf    binary
+*.woff2  binary
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.ico    binary
+*.pdf    binary
+*.docx   binary
+*.zip    binary
+*.gz     binary
+*.bz2    binary
+*.lzma   binary
+*.tar    binary
