@@ -17,6 +17,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install system dependencies (gmsh native libs)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libglu1-mesa libgl1 libgomp1
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
