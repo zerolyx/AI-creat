@@ -1,0 +1,4 @@
+interface:
+  display_name: "Robot Competition Copilot"
+  short_description: "Guide robot competition integration and field debugging."
+  default_prompt: "Use $robot-competition-copilot to plan a safe test for my current robot task."
