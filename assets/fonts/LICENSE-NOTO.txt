@@ -1,0 +1,5 @@
+Noto Sans SC is distributed under the Apache License, Version 2.0.
+Copyright 2014-2023 The Noto Project Authors.
+
+The full license text is available at:
+https://www.apache.org/licenses/LICENSE-2.0
