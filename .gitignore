@@ -1,20 +1,49 @@
-.venv/
+# ------------------------------------------------------------------
+# AI-creat root .gitignore
+# The CalculiX solver runtime (runtime/ccx/*.exe, *.dll) is NOT tracked:
+# fetch it with `scripts/fetch-ccx.ps1` before running or packaging.
+# ------------------------------------------------------------------
+
+# ---- Python ----
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
+*.pyd
+.venv/
+venv/
+env/
+.python-version
 .pytest_cache/
 .mypy_cache/
-
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+*.egg
 build/
 dist/
-*.spec.bak
+wheels/
 
-runs/
+# ---- CalculiX runtime (obtained via scripts/fetch-ccx.ps1) ----
+# The whole runtime/ccx/ directory is fetch-managed: none of its working
+# files (solver binary, DLLs, license copy) are tracked.
+runtime/ccx/
+
+# ---- Packaging / build ----
+*.spec.bak
 packaged_*/
+packaged_worker.log
 *.log
 *.out
 *.err
+runs/
+*.tmp
 
+# ---- IDE / OS ----
 .idea/
 .vscode/
+*.swp
+.DS_Store
 Thumbs.db
 desktop.ini
