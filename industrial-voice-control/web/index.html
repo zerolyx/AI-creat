@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17212b">
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/bot.svg">
+  <title>工业机器人语音控制示例</title>
+  <script src="/theme.js"></script>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app-shell" id="appShell" data-voice-state="initializing">
+    <header class="top-rail">
+      <div class="brand-lockup">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <div>
+          <p class="brand-kicker">INDUSTRIAL VOICE CONTROL</p>
+          <h1>工业机器人语音控制示例</h1>
+        </div>
+      </div>
+
+      <div class="top-meta" aria-label="系统时间和版本">
+        <div class="meta-block">
+          <span>本机时间</span>
+          <strong id="systemClock">--:--:--</strong>
+        </div>
+        <div class="meta-block">
+          <span>软件版本</span>
+          <strong id="buildVersion">2.6.0-open-source</strong>
+        </div>
+      </div>
+
+      <div class="mode-switch" role="group" aria-label="工作模式">
+        <button type="button" class="mode-button is-active" data-mode="robot">
+          <img src="/assets/icons/bot.svg" alt="">
+          <span>机器人控制</span>
+        </button>
+        <button type="button" class="mode-button" data-mode="chat">
+          <img src="/assets/icons/message-square.svg" alt="">
+          <span>AI 对话</span>
+        </button>
+      </div>
+
+      <div class="theme-control" role="group" aria-label="界面主题">
+        <button type="button" data-theme-option="system" aria-label="跟随系统主题" title="跟随系统主题"><img src="/assets/icons/monitor.svg" alt=""></button>
+        <button type="button" data-theme-option="light" aria-label="浅色主题" title="浅色主题"><img src="/assets/icons/sun.svg" alt=""></button>
+        <button type="button" data-theme-option="dark" aria-label="深色主题" title="深色主题"><img src="/assets/icons/moon.svg" alt=""></button>
+      </div>
+
+      <a class="engineer-link" href="/engineer.html" title="打开工程师诊断中心">
+        <img src="/assets/icons/wrench.svg" alt="">
+        <span>工程诊断</span>
+      </a>
+
+      <button type="button" class="icon-button shutdown-button" id="shutdownButton" title="安全关闭程序" aria-label="安全关闭程序">
+        <img src="/assets/icons/power.svg" alt="">
+      </button>
+    </header>
+
+    <section class="safety-rail" aria-label="控制安全状态">
+      <div class="safety-state" id="safetyState" data-level="pending">
+        <img src="/assets/icons/shield-check.svg" alt="">
+        <span class="status-lamp" aria-hidden="true"></span>
+        <strong id="safetyTitle">联锁检查中</strong>
+      </div>
+      <p id="safetyDescription">机器人通信确认前，运动指令不会下发。</p>
+      <div class="safety-address">
+        <span>机器人地址</span>
+        <strong id="robotEndpoint">127.0.0.1:502</strong>
+      </div>
+    </section>
+
+    <main class="workspace">
+      <section class="voice-stage" aria-labelledby="voiceHeading">
+        <header class="voice-stage-header">
+          <div>
+            <p class="section-kicker">VOICE OPERATION</p>
+            <h2 id="voiceHeading">语音作业台</h2>
+          </div>
+          <div class="channel-state" id="channelState" data-level="pending">
+            <span class="status-lamp" aria-hidden="true"></span>
+            <strong>INITIALIZING</strong>
+          </div>
+        </header>
+
+        <div class="capture-zone">
+          <canvas id="waveCanvas" aria-label="实时麦克风波形"></canvas>
+          <div class="voice-readout">
+            <span class="readout-code" id="voiceCode">SYS / 00</span>
+            <p id="voiceStateText">正在初始化本地语音系统</p>
+            <strong id="liveTranscript">等待语音输入</strong>
+            <div class="recognition-metrics" aria-label="本次识别质量">
+              <div><span>识别置信度</span><strong id="confidenceValue">--</strong></div>
+              <div><span>环境信噪比</span><strong id="snrValue">-- dB</strong></div>
+              <div><span>录音时长</span><strong id="durationValue">0.0 s</strong></div>
+            </div>
+          </div>
+
+          <div class="talk-zone">
+            <button type="button" class="talk-control" id="talkButton" disabled aria-label="点击开始说话">
+              <span class="talk-radar" aria-hidden="true"></span>
+              <span class="talk-core"><img id="talkIcon" src="/assets/icons/mic.svg" alt=""></span>
+            </button>
+            <strong class="talk-label" id="talkLabel">点击说话</strong>
+            <span>再次点击后结束并识别</span>
+          </div>
+
+          <div class="meter-block" aria-label="麦克风电平">
+            <div class="meter-label"><span>麦克风电平</span><strong id="levelValue">00</strong></div>
+            <div class="level-meter"><span id="levelBar"></span></div>
+            <div class="meter-scale"><span>-48</span><span>-24</span><span>-12</span><span>0 dB</span></div>
+          </div>
+        </div>
+
+        <section class="command-gate" id="commandGate" data-level="idle" aria-labelledby="commandGateHeading">
+          <div class="gate-heading">
+            <div>
+              <span id="commandGateHeading">安全下发门</span>
+              <strong id="commandGateText">等待语音指令</strong>
+            </div>
+            <strong class="gate-verdict" id="commandGateVerdict">LOCKED</strong>
+          </div>
+          <div class="process-track" id="processTrack" aria-label="语音处理进度">
+            <span data-stage="capture"><i>1</i><strong>语音采集</strong></span>
+            <span data-stage="recognize"><i>2</i><strong>指令解析</strong></span>
+            <span data-stage="interlock"><i>3</i><strong>安全联锁</strong></span>
+          </div>
+          <div class="gate-route">
+            <div><span>解析动作</span><strong id="commandName">尚未解析</strong></div>
+            <div><span>目标寄存器</span><strong id="commandRegister">--</strong></div>
+            <div><span>写入值</span><strong id="commandValue">--</strong></div>
+          </div>
+        </section>
+
+        <div class="voice-controls">
+          <label class="toggle-control" for="autoListenToggle">
+            <input type="checkbox" id="autoListenToggle" disabled>
+            <span class="toggle-track"><i></i></span>
+            <span><strong>自动唤醒</strong><small>等待“你好同学”</small></span>
+          </label>
+          <div class="sound-state">
+            <img src="/assets/icons/headphones.svg" alt="">
+            <span><small>中文播报</small><strong id="soundLabel">中文语音待机</strong></span>
+          </div>
+          <button type="button" class="tool-button" id="soundButton" disabled aria-label="试听中文语音播报">
+            <img src="/assets/icons/volume-2.svg" alt="">
+            <span>试听播报</span>
+          </button>
+          <button type="button" class="tool-button" id="reconnectButton" aria-label="重新连接机器人">
+            <img src="/assets/icons/refresh-cw.svg" alt="">
+            <span>重连机器人</span>
+          </button>
+        </div>
+      </section>
+
+      <aside class="inspector" aria-label="运行信息">
+        <div class="inspector-tabs" role="tablist" aria-label="运行信息分类">
+          <button type="button" class="inspector-tab is-active" role="tab" aria-selected="true" aria-controls="runPanel" data-panel-tab="run">运行</button>
+          <button type="button" class="inspector-tab" role="tab" aria-selected="false" aria-controls="systemPanel" data-panel-tab="system">设备<span class="tab-alert" id="systemAlertCount"></span></button>
+          <button type="button" class="inspector-tab" role="tab" aria-selected="false" aria-controls="commandPanel" data-panel-tab="command">指令</button>
+        </div>
+
+        <div class="inspector-panel is-active" id="runPanel" role="tabpanel" data-panel="run">
+          <section class="current-operation" aria-labelledby="operationHeading" data-level="idle">
+            <div class="panel-heading">
+              <span id="operationHeading">当前任务</span>
+              <i id="operationCode">IDLE</i>
+            </div>
+            <strong id="currentAction">等待机器人指令</strong>
+            <p>本地配置寄存器 · 单次写入 · 写入后释放</p>
+          </section>
+          <section class="conversation-log" aria-label="语音会话记录">
+            <div class="panel-heading">
+              <span>会话记录</span>
+              <div class="log-actions">
+                <strong id="messageCount">00</strong>
+                <button type="button" class="clear-log-button" id="clearMessagesButton" title="清空会话记录" aria-label="清空会话记录">
+                  <img src="/assets/icons/x.svg" alt="">
+                  <span>清空</span>
+                </button>
+              </div>
+            </div>
+            <div class="message-list" id="messageList" aria-live="polite"></div>
+          </section>
+        </div>
+
+        <div class="inspector-panel" id="systemPanel" role="tabpanel" data-panel="system" hidden>
+          <div class="status-stack" id="statusStack">
+            <div class="status-row" data-status-key="robot" data-level="pending"><img src="/assets/icons/bot.svg" alt=""><div><span>工业机器人</span><strong>正在检查</strong></div><i aria-hidden="true"></i></div>
+            <div class="status-row" data-status-key="microphone" data-level="pending"><img src="/assets/icons/mic.svg" alt=""><div><span>麦克风输入</span><strong>正在检查</strong></div><i aria-hidden="true"></i></div>
+            <div class="status-row" data-status-key="speaker" data-level="pending"><img src="/assets/icons/volume-2.svg" alt=""><div><span>中文语音输出</span><strong>正在检查</strong></div><i aria-hidden="true"></i></div>
+            <div class="status-row" data-status-key="recognition" data-level="pending"><img src="/assets/icons/activity.svg" alt=""><div><span>语音识别</span><strong>正在检查</strong></div><i aria-hidden="true"></i></div>
+            <div class="status-row" data-status-key="ollama" data-level="pending"><img src="/assets/icons/cpu.svg" alt=""><div><span>本地大模型</span><strong>正在检查</strong></div><i aria-hidden="true"></i></div>
+            <div class="status-row" data-status-key="local_modbus" data-level="pending"><img src="/assets/icons/server.svg" alt=""><div><span>工艺顺序参考</span><strong>正在检查</strong></div><i aria-hidden="true"></i></div>
+          </div>
+          <div class="system-spec">
+            <div><span>唤醒词</span><strong id="wakeWord">你好同学</strong></div>
+            <div><span>识别模型</span><strong id="whisperModel">WHISPER SMALL</strong></div>
+            <div><span>对话模型</span><strong id="ollamaModel">QWEN2.5:7B</strong></div>
+          </div>
+        </div>
+
+        <div class="inspector-panel" id="commandPanel" role="tabpanel" data-panel="command" hidden>
+          <section class="command-index" aria-labelledby="commandHeading">
+            <div class="panel-heading"><span id="commandHeading">示例工艺参考</span><strong>5 项</strong></div>
+            <ol aria-label="示例顺序参考和直接下发指令">
+              <li><button type="button" data-command-value="1" data-command-name="示例搬运"><span>1</span><strong>示例搬运</strong><i>本地配置 = 1</i></button></li>
+              <li><button type="button" data-command-value="2" data-command-name="示例定位"><span>2</span><strong>示例定位</strong><i>本地配置 = 2</i></button></li>
+              <li><button type="button" data-command-value="3" data-command-name="示例检测"><span>3</span><strong>示例检测</strong><i>本地配置 = 3</i></button></li>
+              <li><button type="button" data-command-value="4" data-command-name="示例装配"><span>4</span><strong>示例装配</strong><i>本地配置 = 4</i></button></li>
+              <li><button type="button" data-command-value="5" data-command-name="示例复位"><span>5</span><strong>示例复位</strong><i>本地配置 = 5</i></button></li>
+            </ol>
+            <p class="command-note">安全示例：请先配置私有现场映射并完成低速、空载验证，再启用机器人控制。</p>
+          </section>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="footer-rail">
+      <div class="footer-status"><span class="status-lamp"></span><strong id="footerStatus">本地服务连接中</strong></div>
+      <p>推理与控制均在本机运行；机器人通信未确认时，运动指令保持锁止。</p>
+      <strong>IVC</strong>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="/app.js" defer></script>
+</body>
+</html>

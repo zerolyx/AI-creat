@@ -1,0 +1,13 @@
+# Validated on Windows 11 x64 with Python 3.11.9 on 2026-08-12.
+pyttsx3==2.99
+openai-whisper==20250625
+sounddevice==0.5.5
+numpy==2.4.6
+ollama==0.6.2
+pyModbusTCP==0.3.0
+webrtcvad-wheels==2.0.14
+soundfile==0.14.0
+pywin32==312
+setuptools==84.0.0
+opencc-python-reimplemented==0.1.7
+torch==2.13.0

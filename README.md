@@ -4,6 +4,15 @@
 
 - [AI-FEA Valve Gripper](#ai-fea-valve-gripper)：球阀自动装配夹爪的 Windows 有限元分析助手。
 - [robot-competition-copilot](robot-competition-copilot/SKILL.md)：机器人竞赛协作技能。
+- [Industrial Voice Control](industrial-voice-control/README.md)：默认锁止的工业机器人语音控制安全开源示例。
+
+---
+
+## Industrial Voice Control
+
+面向工业机器人 Modbus TCP 集成的本地语音控制参考实现。公开版本默认不连接、不探测、不控制任何现场机器人；地址、端口和寄存器只能放在被忽略的私有配置文件中。
+
+完整安装、安全边界、测试与发布说明见 [industrial-voice-control/README.md](industrial-voice-control/README.md)。该子项目按 [MIT](industrial-voice-control/LICENSE) 发布，第三方字体和图标许可证见 [其第三方说明](industrial-voice-control/THIRD_PARTY_NOTICES.md)。
 
 ---
 
@@ -74,7 +83,7 @@ python -m unittest discover -s tests -v
 
 ## 许可证与第三方组件
 
-本项目按 [GPL-2.0](LICENSE) 发布，以适配随仓库分发的 CalculiX 与 Gmsh 相关开源组件。第三方组件说明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+AI-FEA Valve Gripper 及其随附的 CalculiX/Gmsh 相关组件按 [GPL-2.0](LICENSE) 发布。`industrial-voice-control/` 是独立的 MIT 子项目，许可证和第三方说明位于其目录内。根目录第三方组件说明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
 ## 贡献
 
