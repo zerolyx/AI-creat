@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17212b">
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/wrench.svg">
+  <title>工程师诊断中心 · 工业机器人语音控制示例</title>
+  <script src="/theme.js"></script>
+  <link rel="stylesheet" href="/engineer.css">
+</head>
+<body>
+  <div class="engineer-shell" id="engineerShell" data-health="pending">
+    <header class="engineer-header">
+      <div class="brand-lockup">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <div>
+          <p>INDUSTRIAL VOICE CONTROL / ENGINEERING</p>
+          <h1>工程师诊断中心</h1>
+        </div>
+      </div>
+      <div class="readonly-badge"><img src="/assets/icons/shield-check.svg" alt=""><span>只读诊断</span></div>
+      <div class="header-meta"><span>运行时间</span><strong id="uptimeValue">--</strong></div>
+      <div class="header-meta"><span>软件版本</span><strong id="versionValue">--</strong></div>
+      <div class="theme-control" role="group" aria-label="界面主题">
+        <button type="button" data-theme-option="system" aria-label="跟随系统主题" title="跟随系统主题"><img src="/assets/icons/monitor.svg" alt=""></button>
+        <button type="button" data-theme-option="light" aria-label="浅色主题" title="浅色主题"><img src="/assets/icons/sun.svg" alt=""></button>
+        <button type="button" data-theme-option="dark" aria-label="深色主题" title="深色主题"><img src="/assets/icons/moon.svg" alt=""></button>
+      </div>
+      <a class="operator-link" href="/">
+        <img src="/assets/icons/chevron-right.svg" alt="">
+        <span>返回操作台</span>
+      </a>
+    </header>
+
+    <section class="health-rail" id="healthRail" data-level="pending" aria-label="诊断总状态">
+      <div class="health-title"><span class="status-lamp"></span><strong id="healthTitle">诊断数据连接中</strong></div>
+      <p id="healthDescription">正在读取本机语音与机器人通信状态。</p>
+      <time id="lastRefresh">--:--:--</time>
+    </section>
+
+    <section class="summary-strip" aria-label="关键运行指标">
+      <div class="summary-cell"><span>核心服务</span><strong id="serviceSummary">检查中</strong><small id="serviceDetail">--</small></div>
+      <div class="summary-cell"><span>机器人链路</span><strong id="robotSummary">检查中</strong><small id="robotDetail">--</small></div>
+      <div class="summary-cell"><span>语音输出</span><strong id="speakerSummary">检查中</strong><small id="speakerDetail">--</small></div>
+      <div class="summary-cell"><span>最近识别</span><strong id="asrSummary">暂无数据</strong><small id="asrDetail">--</small></div>
+    </section>
+
+    <main class="diagnostic-workspace">
+      <section class="log-workbench" aria-labelledby="logHeading">
+        <header class="workbench-header">
+          <div>
+            <p>DIAGNOSTIC STREAM</p>
+            <h2 id="logHeading">运行日志</h2>
+          </div>
+          <div class="stream-state"><span class="status-lamp"></span><strong id="streamState">实时更新</strong></div>
+        </header>
+
+        <div class="log-toolbar">
+          <div class="log-tabs" role="tablist" aria-label="日志来源">
+            <button type="button" class="log-tab is-active" role="tab" aria-selected="true" data-log-view="events">实时事件</button>
+            <button type="button" class="log-tab" role="tab" aria-selected="false" data-log-view="file">本次文件日志</button>
+          </div>
+          <label class="filter-control">
+            <span>级别</span>
+            <select id="levelFilter">
+              <option value="all">全部</option>
+              <option value="error">错误</option>
+              <option value="warning">警告</option>
+              <option value="success">正常</option>
+              <option value="info">信息</option>
+            </select>
+          </label>
+          <label class="search-control">
+            <img src="/assets/icons/activity.svg" alt="">
+            <input type="search" id="logSearch" maxlength="80" placeholder="搜索日志">
+          </label>
+          <button type="button" class="icon-command" id="pauseButton" aria-label="暂停日志刷新" title="暂停日志刷新">
+            <img src="/assets/icons/circle-stop.svg" alt="">
+          </button>
+          <button type="button" class="icon-command" id="refreshButton" aria-label="立即刷新" title="立即刷新">
+            <img src="/assets/icons/refresh-cw.svg" alt="">
+          </button>
+          <button type="button" class="icon-command clear-command" id="clearLogsButton" aria-label="清空本次诊断日志" title="清空本次诊断日志">
+            <img src="/assets/icons/trash-2.svg" alt="">
+          </button>
+        </div>
+
+        <div class="log-table-head" aria-hidden="true"><span>时间</span><span>级别</span><span>来源</span><span>事件</span></div>
+        <div class="diagnostic-list" id="diagnosticList" aria-live="polite"></div>
+        <footer class="log-footer"><span id="logCount">0 条记录</span><span id="logSource">实时事件缓冲区</span></footer>
+      </section>
+
+      <aside class="diagnostic-aside" aria-label="诊断详情">
+        <section class="issue-section" aria-labelledby="issueHeading">
+          <header class="aside-heading"><span>ACTIVE FINDINGS</span><h2 id="issueHeading">当前问题</h2><strong id="issueCount">0</strong></header>
+          <div class="issue-list" id="issueList"></div>
+        </section>
+
+        <section class="device-section" aria-labelledby="deviceHeading">
+          <header class="aside-heading"><span>DEVICE HEALTH</span><h2 id="deviceHeading">设备状态</h2></header>
+          <div class="device-list" id="deviceList"></div>
+        </section>
+
+        <section class="runtime-section" aria-labelledby="runtimeHeading">
+          <header class="aside-heading"><span>RUNTIME SNAPSHOT</span><h2 id="runtimeHeading">运行快照</h2></header>
+          <dl class="runtime-list">
+            <div><dt>工作模式</dt><dd id="modeValue">--</dd></div>
+            <div><dt>语音状态</dt><dd id="voiceStateValue">--</dd></div>
+            <div><dt>指令联锁</dt><dd id="gateValue">--</dd></div>
+            <div><dt>写入结果</dt><dd id="writeOutcomeValue">--</dd></div>
+            <div><dt>Python</dt><dd id="pythonValue">--</dd></div>
+            <div><dt>进程 PID</dt><dd id="pidValue">--</dd></div>
+          </dl>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="engineer-footer">
+      <strong>IVC ENGINEERING CONSOLE</strong>
+      <span>本界面仅管理诊断视图，不提供机器人运动控制。</span>
+      <span id="logMeta">日志文件检查中</span>
+    </footer>
+
+    <dialog class="confirm-dialog" id="clearLogsDialog" aria-labelledby="clearLogsTitle">
+      <form method="dialog">
+        <header>
+          <span>DIAGNOSTIC SESSION</span>
+          <h2 id="clearLogsTitle">清空本次诊断日志</h2>
+        </header>
+        <p>实时事件与本次文件日志视图将从零开始。底层历史日志继续保留，用于故障追溯和现场审计。</p>
+        <div class="dialog-actions">
+          <button type="submit" value="cancel">取消</button>
+          <button type="submit" value="confirm" class="danger-action">清空本次日志</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+  <script src="/engineer.js" defer></script>
+</body>
+</html>
