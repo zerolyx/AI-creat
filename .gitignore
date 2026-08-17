@@ -1,0 +1,20 @@
+# Python runtime artifacts
+__pycache__/
+*.py[cod]
+
+# Local diagnostics and deployment state
+voice_assistant.log
+install_deps_run.log
+deployment_report.json
+robot_config.local.env
+
+# Local browser and generated UI evidence
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.bmp
+
+# Historical local backups and release artifacts
+backups/
+*.zip
