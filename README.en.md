@@ -37,7 +37,9 @@ A Windows finite-element analysis assistant for automatic-assembly grippers for
 Q41F-16P / 16RL flanged ball valves. It performs real meshing and linear-static
 solving locally with Gmsh and CalculiX — no cloud solver dependency.
 
-![Ball-valve gripper analysis UI](docs/gui_valve_gripper_final.png)
+![Ball-valve gripper analysis UI (results)](docs/gui_valve_gripper_final.png)
+
+![Ball-valve gripper analysis UI (solving)](docs/gui_valve_running.png)
 
 Package documentation: [src/ai_fea_mvp/README.md](src/ai_fea_mvp/README.md)
 
@@ -151,7 +153,8 @@ font and icon licenses are in its
 ## Development
 
 - **Commits**: Conventional Commits (`feat:` / `fix:` / `docs:` / `refactor:` /
-  `chore:` / `test:`); see [CONTRIBUTING.md](CONTRIBUTING.md).
+  `chore:` / `test:`); see [CONTRIBUTING.en.md](CONTRIBUTING.en.md)
+  ([中文](CONTRIBUTING.md)).
 - **CI**: `.github/workflows/ci.yml` runs the main project's headless tests on
   every push / PR.
 

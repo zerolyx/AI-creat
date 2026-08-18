@@ -1,5 +1,7 @@
 # Contributing
 
+> **中文** · [English](CONTRIBUTING.en.md) · 仓库首页：[中文](README.md) / [English](README.en.md)
+
 欢迎为 AI-creat 仓库贡献。请保持改动聚焦、可复现，并在涉及网格划分、边界条件、结果解析、机器人负载计算或报告输出时附上可复现的测试用例。
 
 ## 提交规范（Conventional Commits）

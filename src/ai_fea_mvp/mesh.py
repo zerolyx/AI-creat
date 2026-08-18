@@ -20,6 +20,7 @@ from .models import BeamCase, MeshData
 def _signed_tet_volume(
     nodes: dict[int, tuple[float, float, float]], conn: tuple[int, ...]
 ) -> float:
+    """Signed volume of a tetrahedron; sign indicates Gmsh orientation."""
     p1 = nodes[conn[0]]
     p2 = nodes[conn[1]]
     p3 = nodes[conn[2]]
@@ -34,6 +35,7 @@ def _signed_tet_volume(
 def _gmsh_to_calculix_tet(
     nodes: dict[int, tuple[float, float, float]], conn: tuple[int, ...]
 ) -> tuple[int, ...]:
+    """Reorder a Gmsh tetra (C3D4/C3D10) into CalculiX orientation."""
     if len(conn) == 4:
         return conn
     # Gmsh and CalculiX use opposite tetrahedral orientation in this pipeline.
@@ -57,6 +59,7 @@ def _gmsh_to_calculix_tet(
 
 
 def mesh_step_cantilever(case: BeamCase, step_path: Path, mesh_path: Path) -> MeshData:
+    """Mesh a STEP assembly with Gmsh and return MeshData (nodes, elements, boundary node sets, physical groups)."""
     if not step_path.exists():
         raise FileNotFoundError(step_path)
 

@@ -25,18 +25,22 @@ class StepGeometry:
 
     @property
     def length_mm(self) -> float:
+        """Overall X extent of the assembly bounding box [mm]."""
         return self.bbox[3] - self.bbox[0]
 
     @property
     def width_mm(self) -> float:
+        """Overall Y extent of the assembly bounding box [mm]."""
         return self.bbox[4] - self.bbox[1]
 
     @property
     def height_mm(self) -> float:
+        """Overall Z extent of the assembly bounding box [mm]."""
         return self.bbox[5] - self.bbox[2]
 
 
 def inspect_step_geometry(step_path: Path) -> StepGeometry:
+    """Return volume count and bounding boxes for a STEP assembly."""
     if not step_path.exists():
         raise FileNotFoundError(step_path)
 
@@ -70,6 +74,7 @@ def inspect_step_geometry(step_path: Path) -> StepGeometry:
 
 
 def auto_case_for_step(info: StepGeometry) -> BeamCase:
+    """Derive a sensible first-pass BeamCase (geometric dims + PLA default) from a STEP inspection."""
     if info.length_mm <= 0.0 or info.width_mm <= 0.0 or info.height_mm <= 0.0:
         raise RuntimeError(f"STEP 包围盒无效：{info.bbox}")
     cross_section = min(info.width_mm, info.height_mm)
@@ -86,6 +91,7 @@ def auto_case_for_step(info: StepGeometry) -> BeamCase:
 
 
 def create_cantilever_step(case: BeamCase, step_path: Path) -> Path:
+    """Generate the validation cantilever STEP model for a given BeamCase."""
     step_path.parent.mkdir(parents=True, exist_ok=True)
     if step_path.exists():
         step_path.unlink()

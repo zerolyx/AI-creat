@@ -74,6 +74,7 @@ FIELD_COLORS = (
 
 
 def _register_ui_font() -> str:
+    """Register the bundled Chinese font(s) with QFontDatabase for UI use."""
     font_path = bundled_root() / "assets" / "fonts" / "NotoSansSC-Regular.otf"
     if font_path.exists():
         font_id = QFontDatabase.addApplicationFont(str(font_path))
@@ -84,6 +85,7 @@ def _register_ui_font() -> str:
 
 
 def _mix_color(value: float) -> QColor:
+    """Blend two QColors by ratio; used for gradient/theme derivation."""
     value = min(1.0, max(0.0, value))
     scaled = value * (len(FIELD_COLORS) - 1)
     left = min(int(scaled), len(FIELD_COLORS) - 2)
@@ -124,14 +126,17 @@ class ResultCanvas(QFrame):
         self._reveal_animation.valueChanged.connect(self._set_reveal_progress)
 
     def set_case(self, case: BeamCase) -> None:
+        """Set the BeamCase the canvas should render context from."""
         self.case = case
         self.update()
 
     def set_geometry(self, geometry: StepGeometry | None) -> None:
+        """Set the STEP geometry preview (StepGeometry) to draw the outline."""
         self.geometry = geometry
         self.update()
 
     def set_running(self, running: bool) -> None:
+        """Switch the canvas into the running/computing visual state."""
         self.running = running
         if running:
             self.activity_phase = 0
@@ -141,14 +146,17 @@ class ResultCanvas(QFrame):
         self.update()
 
     def set_theme(self, dark: bool) -> None:
+        """Apply a light or dark theme to the canvas palette."""
         self.dark = dark
         self.update()
 
     def set_mode(self, mode: str) -> None:
+        """Switch field mode (stress vs displacement) for the cloud rendering."""
         self.mode = mode
         self.update()
 
     def set_summary(self, summary: RunSummary | None) -> None:
+        """Provide the RunSummary whose fields the canvas renders."""
         self.summary = summary
         self.fields = None
         self.error_message = ""
@@ -166,15 +174,18 @@ class ResultCanvas(QFrame):
         self.update()
 
     def _advance_activity(self) -> None:
+        """Advance the staged activity animation/timer for the running state."""
         self.activity_phase = (self.activity_phase + 1) % 120
         self.update()
 
     @Slot(object)
     def _set_reveal_progress(self, value: object) -> None:
+        """Set paint reveal progress (0..1) for a staged redraw."""
         self.reveal_progress = float(value)
         self.update()
 
     def paintEvent(self, _event) -> None:  # noqa: N802
+        """Paint the canvas: grid, geometry preview, field cloud, markers, legend or running state."""
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         bg = QColor("#0A0D10" if self.dark else "#F3F5F7")
@@ -192,6 +203,7 @@ class ResultCanvas(QFrame):
             self._text(painter, self.error_message, 28, self.height() - 28, 10, "#D9473F", True)
 
     def _draw_grid(self, painter: QPainter) -> None:
+        """Draw the background grid and axes guide."""
         color = QColor("#182027" if self.dark else "#DFE4E8")
         painter.setPen(QPen(color, 1))
         for x in range(32, self.width(), 48):
@@ -200,6 +212,7 @@ class ResultCanvas(QFrame):
             painter.drawLine(0, y, self.width(), y)
 
     def _paint_empty(self, painter: QPainter) -> None:
+        """Paint the empty/prompt state before any analysis."""
         fg = "#EEF2F4" if self.dark else "#171B1F"
         muted = "#7E8A93" if self.dark else "#68737C"
         self._text(painter, "导入 STEP，开始理解你的结构", 30, 54, 18, fg, True)
@@ -213,6 +226,7 @@ class ResultCanvas(QFrame):
         painter.drawLine(center.x() - 65, center.y() - 104, center.x() + 165, center.y() - 104)
 
     def _paint_geometry_preview(self, painter: QPainter) -> None:
+        """Paint the imported STEP geometry outline preview."""
         geometry = self.geometry
         if geometry is None:
             return
@@ -246,6 +260,7 @@ class ResultCanvas(QFrame):
         self._text(painter, "几何预览 · 等待真实求解", 28, self.height() - 24, 10, muted)
 
     def _paint_field(self, painter: QPainter) -> None:
+        """Paint the solved stress/displacement field cloud from FieldResults."""
         fields = self.fields
         summary = self.summary
         if fields is None or summary is None:
@@ -263,6 +278,7 @@ class ResultCanvas(QFrame):
         deformation_scale = min(10000.0, span * 0.12 / max(max_disp, 1.0e-12))
 
         def deformed(node: int) -> tuple[float, float, float]:
+            """Return the deformed node coordinate for a node (scaled) under the loaded state."""
             x, y, z = coords[node]
             dx, dy, dz = fields.displacements.get(node, (0.0, 0.0, 0.0))
             return x + dx * deformation_scale, y + dy * deformation_scale, z + dz * deformation_scale
@@ -323,6 +339,7 @@ class ResultCanvas(QFrame):
         scale: float,
         result_id: int,
     ) -> None:
+        """Paint the max-value marker (displacement or stress location)."""
         if self.reveal_progress < 0.82:
             return
         if self.mode == "stress":
@@ -347,6 +364,7 @@ class ResultCanvas(QFrame):
         self._text(painter, label, end.x() + 6, end.y() + 4, 9, color.name(), True)
 
     def _paint_legend(self, painter: QPainter, label: str, maximum: float, unit: str, scale: float) -> None:
+        """Paint the color legend for the current field mode."""
         fg = "#EEF2F4" if self.dark else "#171B1F"
         muted = "#8A969E" if self.dark else "#68737C"
         self._text(painter, label, 24, 32, 12, fg, True)
@@ -363,6 +381,7 @@ class ResultCanvas(QFrame):
         self._text(painter, "0", bar_x - 3, bar_top + bar_h + 5, 9, muted)
 
     def _paint_running(self, painter: QPainter) -> None:
+        """Paint the computing overlay while the solver runs."""
         painter.fillRect(self.rect(), QColor(8, 12, 15, 150))
         rect = QRectF(self.width() / 2 - 155, self.height() / 2 - 38, 310, 76)
         painter.setPen(QPen(QColor("#3A4852"), 1))
@@ -377,6 +396,7 @@ class ResultCanvas(QFrame):
 
     @staticmethod
     def _text(painter: QPainter, text: str, x: float, y: float, size: int, color: str, bold: bool = False) -> None:
+        """Helper to draw text with font/alignment options."""
         font = QFont(FONT_FAMILY, size)
         font.setBold(bold)
         painter.setFont(font)
@@ -437,6 +457,7 @@ class AutomationTrack(QFrame):
         self.set_stage(-1)
 
     def set_stage(self, stage: int) -> None:
+        """Set the automation-track stage (1..5) for progress dots/labels."""
         self.stage = stage
         for index, label in enumerate(self.stage_labels):
             label.setProperty("state", "done" if index < stage else "active" if index == stage else "idle")
@@ -575,6 +596,7 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def _number(value: float, minimum: float, maximum: float, decimals: int) -> QDoubleSpinBox:
+        """Parse a UI spinbox text into a float (0.0 on error)."""
         box = QDoubleSpinBox()
         box.setRange(minimum, maximum)
         box.setDecimals(decimals)
@@ -583,6 +605,7 @@ class MainWindow(QMainWindow):
         return box
 
     def _build_ui(self) -> None:
+        """Construct the full main window layout, widgets and connections."""
         root = QWidget()
         root.setObjectName("root")
         outer = QVBoxLayout(root)
@@ -768,6 +791,7 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage("就绪 · 选择 STEP 模型开始")
 
     def _section_title(self, title: str, helper: str) -> QWidget:
+        """Create a styled section heading label."""
         widget = QWidget()
         layout = QVBoxLayout(widget)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -780,11 +804,13 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def _label(text: str, object_name: str) -> QLabel:
+        """Create a styled label widget."""
         label = QLabel(text)
         label.setObjectName(object_name)
         return label
 
     def _apply_styles(self) -> None:
+        """Apply the current theme's QSS stylesheet to the window."""
         if self._dark:
             colors = {
                 "bg": "#0D1115", "panel": "#141A1F", "panel2": "#192027", "field": "#10161B",
@@ -856,6 +882,7 @@ class MainWindow(QMainWindow):
         """)
 
     def _case(self) -> BeamCase:
+        """Assemble a BeamCase from the current UI field values."""
         return BeamCase(
             length_mm=self.length.value(), height_mm=self.height.value(), width_mm=self.width.value(),
             force_n=self.force.value(), young_mpa=self.young.value(), poisson=self.poisson.value(),
@@ -869,6 +896,7 @@ class MainWindow(QMainWindow):
         )
 
     def _gripper_duty(self) -> GripperDuty:
+        """Build a GripperDuty from the current UI field values."""
         return GripperDuty(
             valve_model=self.valve_model.currentText(),
             nominal_diameter=self.nominal_diameter.currentText(),
@@ -882,6 +910,7 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _update_gripper_duty(self) -> None:
+        """Refresh the CR605 payload/grip-force hint from current inputs."""
         duty = self._gripper_duty()
         overload = not duty.payload_ok
         self.robot_check.setProperty("overload", overload)
@@ -901,6 +930,7 @@ class MainWindow(QMainWindow):
 
     @Slot(str)
     def _apply_material_preset(self, material_name: str) -> None:
+        """Apply the selected material's defaults to the material inputs."""
         preset = MATERIAL_PRESETS[material_name]
         self.young.setValue(preset.young_mpa)
         self.poisson.setValue(preset.poisson)
@@ -909,27 +939,32 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _sync_preview(self) -> None:
+        """Refresh the canvas preview state from current geometry/inputs."""
         self.canvas.set_case(self._case())
 
     @Slot()
     def _toggle_theme(self) -> None:
+        """Toggle between light and dark themes."""
         self._dark = not self._dark
         self.theme_button.setText("浅色" if self._dark else "深色")
         self._apply_styles()
 
     def _set_field_mode(self, mode: str) -> None:
+        """Switch the field combo to stress or displacement mode."""
         self.stress_mode.setChecked(mode == "stress")
         self.displacement_mode.setChecked(mode == "displacement")
         self.canvas.set_mode(mode)
 
     @Slot()
     def _choose_step(self) -> None:
+        """Open a file dialog to pick a STEP/STP model and auto-fill the load case."""
         path, _ = QFileDialog.getOpenFileName(self, "选择 STEP 模型", "", "STEP 模型 (*.step *.stp)")
         if path:
             self.step_path.setText(path)
             self._auto_fill_from_step(Path(path))
 
     def _auto_fill_from_step(self, source: Path) -> None:
+        """Inspect the chosen STEP and fill geometry/load-case auto values."""
         try:
             info = inspect_step_geometry(source)
             case = auto_case_for_step(info)
@@ -962,6 +997,7 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _start_analysis(self) -> None:
+        """Validate inputs, launch the headless worker process (run_gui.py --worker) and update UI to running."""
         if self._process is not None:
             return
         duty_message = ""
@@ -1052,6 +1088,7 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _read_process_output(self) -> None:
+        """Drain the worker's stdout; update log and automation-stage cues."""
         if self._process is None:
             return
         text = bytes(self._process.readAllStandardOutput()).decode("utf-8", errors="replace")
@@ -1070,6 +1107,7 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _read_process_error(self) -> None:
+        """Drain the worker's stderr into the error log."""
         if self._process is None:
             return
         text = bytes(self._process.readAllStandardError()).decode("utf-8", errors="replace")
@@ -1080,6 +1118,7 @@ class MainWindow(QMainWindow):
 
     @Slot(int, QProcess.ExitStatus)
     def _process_finished(self, exit_code: int, _status: QProcess.ExitStatus) -> None:
+        """Handle worker exit: load the summary on success or show failure, then re-enable UI."""
         self._read_process_output()
         self._read_process_error()
         if exit_code == 0:
@@ -1103,6 +1142,7 @@ class MainWindow(QMainWindow):
 
     @Slot(object)
     def _analysis_finished(self, summary: RunSummary) -> None:
+        """Populate all result widgets and canvas from a completed RunSummary."""
         self._last_summary = summary
         self.automation_track.set_stage(5)
         self.title_label.setText(summary.source_model_name)
@@ -1135,6 +1175,7 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage("完成 · 求解器返回码 0 · 云图与中文报告已生成")
 
     def _show_process_failure(self, message: str) -> None:
+        """Show a failed-analysis message and reset the running state."""
         self.canvas.set_running(False)
         self.log.appendPlainText(message)
         self.conclusion_label.setText("分析没有完成。请查看右侧计算过程中的错误信息。")
@@ -1142,6 +1183,7 @@ class MainWindow(QMainWindow):
         QMessageBox.critical(self, "有限元分析失败", message)
 
     def _show_results(self, summary: RunSummary) -> None:
+        """Update the metric cards and AI conclusion from the summary results."""
         result = summary.results
         self.metric_deflection.value_label.setText(f"{result.max_displacement_mm:.4g}")
         self.metric_deflection.note_label.setText(f"最大值位于节点 {result.max_displacement_node}")
@@ -1166,6 +1208,7 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _open_report(self) -> None:
+        """Open the generated Markdown report in a dialog."""
         if self._last_summary is None or self._last_summary.report_path is None:
             return
         dialog = ReportDialog(self._last_summary.report_path, self)
@@ -1174,11 +1217,13 @@ class MainWindow(QMainWindow):
 
     @Slot()
     def _open_results(self) -> None:
+        """Open the run work directory in Explorer."""
         if self._last_summary is not None:
             os.startfile(str(self._last_summary.workdir))
 
 
 def main() -> int:
+    """Application entry point: create QApplication, show MainWindow, run the event loop."""
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()

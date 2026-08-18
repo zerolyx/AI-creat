@@ -17,12 +17,14 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 def bundled_root() -> Path:
+    """Root directory of the bundled app (PyInstaller _MEIPASS when frozen, repo root in source)."""
     if getattr(sys, "frozen", False):
         return Path(getattr(sys, "_MEIPASS"))
     return PROJECT_ROOT
 
 
 def writable_root() -> Path:
+    """User-writable base directory for run outputs when frozen (LOCALAPPDATA), repo root in source."""
     if getattr(sys, "frozen", False):
         base = Path(os.environ.get("LOCALAPPDATA", Path.home()))
         return base / "AI-FEA-Assistant"
@@ -30,6 +32,7 @@ def writable_root() -> Path:
 
 
 def find_calculix() -> Path:
+    """Locate the ccx solver binary checking bundled runtime and tools paths; raises if not found."""
     candidates = [
         bundled_root() / "runtime" / "ccx" / "ccx.exe",
         bundled_root()

@@ -17,6 +17,7 @@ from .models import BeamCase, MeshData
 
 
 def _format_id_lines(ids: list[int], per_line: int = 16) -> list[str]:
+    """Format a sequence of ids as wrapped comma-separated lines."""
     lines: list[str] = []
     for start in range(0, len(ids), per_line):
         lines.append(", ".join(str(i) for i in ids[start : start + per_line]))
@@ -24,6 +25,7 @@ def _format_id_lines(ids: list[int], per_line: int = 16) -> list[str]:
 
 
 def write_calculix_input(case: BeamCase, mesh: MeshData, inp_path: Path) -> Path:
+    """Write the CalculiX `.inp` deck (nodes/elements/sets/material/loads) for one case+mesh."""
     inp_path.parent.mkdir(parents=True, exist_ok=True)
     all_nodes = sorted(mesh.nodes)
     all_elements = sorted(mesh.elements)
@@ -88,6 +90,7 @@ def write_calculix_input(case: BeamCase, mesh: MeshData, inp_path: Path) -> Path
 
 
 def run_calculix(ccx_path: Path, inp_path: Path, log_path: Path) -> int:
+    """Run the ccx solver on a job and write its stdout/stderr+return code to the log; returns the return code."""
     if not ccx_path.exists():
         raise FileNotFoundError(ccx_path)
     if not inp_path.exists():

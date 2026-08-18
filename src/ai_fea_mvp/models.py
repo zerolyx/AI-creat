@@ -41,21 +41,25 @@ class BeamCase:
 
     @property
     def second_moment_mm4(self) -> float:
+        """Rectangular cross-section second moment of area about the bending axis [mm^4]."""
         return self.width_mm * self.height_mm**3 / 12.0
 
     @property
     def theoretical_tip_deflection_mm(self) -> float:
+        """Cantilever tip deflection from Euler-Bernoulli theory [mm]."""
         return self.force_n * self.length_mm**3 / (
             3.0 * self.young_mpa * self.second_moment_mm4
         )
 
     @property
     def theoretical_max_stress_mpa(self) -> float:
+        """Max bending stress from beam theory at the fixed end [MPa]."""
         moment_n_mm = self.force_n * self.length_mm
         return moment_n_mm * (self.height_mm / 2.0) / self.second_moment_mm4
 
     @property
     def load_dof_and_sign(self) -> tuple[int, float]:
+        """Map load_direction to (CalculiX dof, sign) for the CLOAD card."""
         direction = self.load_direction.upper()
         mapping = {
             "+X": (1, 1.0), "-X": (1, -1.0),

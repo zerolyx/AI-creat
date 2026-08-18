@@ -34,7 +34,9 @@ AI-creat/
 
 面向 Q41F-16P / 16RL 法兰球阀自动装配夹爪的 Windows 有限元分析助手。软件使用本地 Gmsh 与 CalculiX 完成真实网格和线性静力求解，不依赖云端求解服务。
 
-![球阀夹爪分析界面](docs/gui_valve_gripper_final.png)
+![球阀夹爪分析界面（结果）](docs/gui_valve_gripper_final.png)
+
+![球阀夹爪分析界面（求解运行中）](docs/gui_valve_running.png)
 
 包级文档见 [src/ai_fea_mvp/README.md](src/ai_fea_mvp/README.md)。
 
@@ -121,7 +123,7 @@ python -m unittest discover -s tests -v
 
 ## 开发与贡献
 
-- **提交规范**：使用 Conventional Commits（`feat:` / `fix:` / `docs:` / `refactor:` / `chore:` / `test:`），详见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+- **提交规范**：使用 Conventional Commits（`feat:` / `fix:` / `docs:` / `refactor:` / `chore:` / `test:`），详见 [CONTRIBUTING.md](CONTRIBUTING.md)（[English](CONTRIBUTING.en.md)）。
 - **CI**：`.github/workflows/ci.yml` 在 push / PR 时自动运行主项目测试（headless 模式）。
 
 ## 许可证矩阵

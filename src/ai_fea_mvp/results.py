@@ -20,10 +20,12 @@ _NUM_RE = re.compile(r"[-+]?(?:\d+\.\d*|\.\d+|\d+)(?:[Ee][-+]?\d+)?")
 
 
 def _numbers(line: str) -> list[float]:
+    """Extract all numeric tokens from a line as floats."""
     return [float(x) for x in _NUM_RE.findall(line)]
 
 
 def _von_mises(sxx: float, syy: float, szz: float, sxy: float, sxz: float, syz: float) -> float:
+    """Compute von Mises equivalent stress from the six stress components."""
     return math.sqrt(
         0.5 * ((sxx - syy) ** 2 + (syy - szz) ** 2 + (szz - sxx) ** 2)
         + 3.0 * (sxy**2 + sxz**2 + syz**2)
@@ -31,6 +33,7 @@ def _von_mises(sxx: float, syy: float, szz: float, sxy: float, sxz: float, syz: 
 
 
 def parse_dat_results(dat_path: Path) -> ParsedResults:
+    """Parse scalar maxima (displacement / von Mises) from a CalculiX .dat file."""
     if not dat_path.exists():
         raise FileNotFoundError(dat_path)
 

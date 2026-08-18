@@ -33,6 +33,7 @@ def run_cantilever(
     source_step: Path | None = None,
     progress: Callable[[str], None] | None = None,
 ) -> RunSummary:
+    """Run one end-to-end analysis (geometry, mesh, solve, parse, report) and persist summary.json plus artifact copies."""
     case = case or BeamCase()
     if case.application_mode == "球阀装配夹爪":
         duty = GripperDuty(
@@ -117,6 +118,7 @@ def run_cantilever(
 
 
 def load_run_summary(summary_path: Path) -> RunSummary:
+    """Load a persisted RunSummary JSON back into a RunSummary object."""
     data = json.loads(summary_path.read_text(encoding="utf-8"))
     return RunSummary(
         workdir=Path(data["workdir"]),
@@ -142,6 +144,7 @@ def load_run_summary(summary_path: Path) -> RunSummary:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Argparse entry point for the headless CLI."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--workdir", default="runs", type=Path)
     parser.add_argument("--ccx", required=True, type=Path)

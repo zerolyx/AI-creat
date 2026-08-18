@@ -16,6 +16,7 @@ from .gripper import CR605_RATED_PAYLOAD_KG, GripperDuty
 
 
 def generate_markdown_report(summary: RunSummary) -> str:
+    """Build the full Chinese Markdown FEA report for a RunSummary."""
     case = summary.case
     result = summary.results
     is_assembly = summary.solid_count > 1
